@@ -28,7 +28,11 @@ void switchLed(bool value) {
 void setup() {
 //	DDRB = 0b00001000;           /* make the PB3 an output */
     DDRB = 0b00011010;
-    PORTB= 0b00000101;
+    PORTB = 0b00000101;
+}
+
+void usi_init(void){
+    USICR = ((0<<USISIE)|(1<<USIOIE)|(0<<USIWM1)|(1<<USIWM0)|(1<<USICS1)|(0<<USICS0)|(0<<USICLK)|(0<<USITC));
 }
 
 void runPWM(bool value) {
@@ -67,28 +71,24 @@ void runPWM(bool value) {
     switchLed(currentCount > currentTrigger);
 }
 
-void usi_init(void){
-    USICR |= ((0<<USISIE)|(1<<USIOIE)|(0<<USIWM1)|(1<<USIWM0)|(1<<USICS1)|(0<<USICS0)|(0<<USICLK)|(0<<USITC));
-}
-
-volatile char SPI_Data=0;
+volatile unsigned char SPI_Data = 0;
 
 ISR (USI_OVF_vect){
     USISR = (1<<USIOIF);              //Clear OVF flag
-    SPI_Data = USIDR;
+    USIDR = SPI_Data;
+    SPI_Data = USIBR;
 }
 
 int main(void)
 {
     setup();
-//    usi_init();
+    usi_init();
 
-//    sei();
+    sei(); //Enable interrupts
     
     while(1)
     {
-        runPWM(PINB & 0b00010000);
-   // runPWM(SPI_Data != 0);
+        runPWM(SPI_Data >= 100);
     }
     return 0;               /* never reached */
 }
