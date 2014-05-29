@@ -76,7 +76,7 @@ int main(void)
     
     while(1)
     {
-        if (PORTB & (1<<PORTB4)) {
+        if (PINB & (1<<PORTB4)) {
             executeCommand(spiCommand);
         }
         runPWM();
