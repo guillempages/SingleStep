@@ -24,27 +24,26 @@ void usi_init(void){
     USICR = ((0<<USISIE)|(1<<USIOIE)|(0<<USIWM1)|(1<<USIWM0)|(1<<USICS1)|(0<<USICS0)|(0<<USICLK)|(0<<USITC));
 }
 
-volatile uint8_t SpiCommand = 0;
-volatile uint8_t SpiResult = 0;
+volatile uint8_t spiCommand = 0;
+volatile uint8_t spiResult = 0;
 
 ISR (USI_OVF_vect){
     USISR = (1<<USIOIF);              //Clear OVF flag
     
-    if (SpiResult != 0) {
-        USIDR = SpiResult;
-        SpiResult = 0;
+    if (spiResult != 0) {
+        USIDR = spiResult;
+        spiResult = 0;
     }
-
-    SpiCommand = USIBR;
+    spiCommand = USIBR;
 }
 
 void executeCommand(uint8_t command) {
     switch (command) {
         case CMD_GET_LIGHT:
-            SpiResult = 123;
+            spiResult = 123;
             break;
         case CMD_GET_STEP:
-            SpiResult = 231;
+            spiResult = 231;
             break;
         case CMD_LED_FADE_ON:
             setLedFade(true);
@@ -65,7 +64,7 @@ void executeCommand(uint8_t command) {
             //Nothing to do.
             break;
     }
-    SpiCommand = 0; //Command was executed.
+    spiCommand = CMD_NOOP; //Command was executed.
 }
 
 int main(void)
@@ -78,7 +77,7 @@ int main(void)
     while(1)
     {
         if (PORTB & (1<<PORTB4)) {
-            executeCommand(SpiCommand);
+            executeCommand(spiCommand);
         }
         runPWM();
     }
