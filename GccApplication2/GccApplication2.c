@@ -10,6 +10,8 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
+#include "commands.h"
+
 typedef uint8_t bool;
 const bool true = 1;
 const bool false = 0;
@@ -22,16 +24,15 @@ int8_t currentTrigger;
 
 void switchLed(bool value) {
 	if (value) {
-		PORTB |= 0b00001000;    /* switch LED on */
+		PORTB |= (1<<PORTB3);    /* switch LED on */
 	} else {
-	    PORTB &= 0b11110111;    /* switch LED off */
+	    PORTB &= ~(1<<PORTB3);    /* switch LED off */
    }
 }
 
 void setup() {
-//	DDRB = 0b00001000;           /* make the PB3 an output */
-    DDRB = 0b00011010;
-    PORTB = 0b00000101;
+    DDRB  = 0b00001010;
+    PORTB = 0b00010101;
 
     ledStatus = false;
     currentTrigger = LED_ON_FREQ;
@@ -88,17 +89,48 @@ void setLedState(bool value) {
     }
 }
 
-volatile unsigned char SPI_Data = 0;
+volatile uint8_t SpiCommand = 0;
+volatile uint8_t SpiResult = 0;
 
 ISR (USI_OVF_vect){
     USISR = (1<<USIOIF);              //Clear OVF flag
-    USIDR = SPI_Data;
-    SPI_Data = USIBR;
-    if (SPI_Data & 1) {
-        setLedFade(SPI_Data >='b' && SPI_Data <='f');
-    } else {
-        setLedState(SPI_Data >='b' && SPI_Data <='f');
+    
+    if (SpiResult != 0) {
+        USIDR = SpiResult;
+        SpiResult = 0;
     }
+
+    SpiCommand = USIBR;
+}
+
+void executeCommand(uint8_t command) {
+    switch (command) {
+        case CMD_GET_LIGHT:
+            SpiResult = 123;
+            break;
+        case CMD_GET_STEP:
+            SpiResult = 231;
+            break;
+        case CMD_LED_FADE_ON:
+            setLedFade(true);
+            break;
+        case CMD_LED_FADE_OFF:
+            setLedFade(false);
+            break;
+        case CMD_LED_SET_ON:
+            setLedState(true);
+            break;
+        case CMD_LED_SET_OFF:
+            setLedState(false);
+            break;
+        case CMD_CONFIG1:
+        case CMD_CONFIG2:
+        case CMD_NOOP:
+        default:
+            //Nothing to do.
+            break;
+    }
+    SpiCommand = 0; //Command was executed.
 }
 
 int main(void)
@@ -110,6 +142,9 @@ int main(void)
     
     while(1)
     {
+        if (PORTB & (1<<PORTB4)) {
+            executeCommand(SpiCommand);
+        }
         runPWM();
     }
     return 0;               /* never reached */
