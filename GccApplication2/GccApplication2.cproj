@@ -116,6 +116,17 @@
     <Compile Include="GccApplication2.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="ledControl.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="myTypes.h">
+      <SubType>compile</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ledControl.c">
+      <SubType>compile</SubType>
+    </Compile>
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>
