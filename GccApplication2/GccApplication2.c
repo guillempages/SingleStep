@@ -14,9 +14,8 @@
 #include "ledControl.h"
 
 void setup() {
-    DDRB  = 0b00001010;
-    PORTB = 0b00010101;
-
+    setupPorts(); // see myTypes.h
+    
     initLeds();
 }
 
@@ -76,7 +75,7 @@ int main(void)
     
     while(1)
     {
-        if (PINB & (1<<PORTB4)) {
+        if (SS_HIGH) {
             executeCommand(spiCommand);
         }
         runPWM();

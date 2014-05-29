@@ -1,4 +1,5 @@
 #include <avr/io.h>
+#include "myTypes.h"
 #include "ledControl.h"
 
 const uint8_t LED_OFF_FREQ = 0;
@@ -15,9 +16,9 @@ void initLeds() {
 void switchLed(bool value)
 {
 	if (value) {
-		PORTB |= (1<<PORTB3);    /* switch LED on */
+		LED_PORT |= LED_PORTx;    /* switch LED on */
 	} else {
-	    PORTB &= ~(1<<PORTB3);    /* switch LED off */
+	    LED_PORT &= ~LED_PORTx;    /* switch LED off */
    }
 }
 
