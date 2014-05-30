@@ -5,7 +5,7 @@
     <ProjectVersion>6.2</ProjectVersion>
     <ToolchainName>com.Atmel.AVRGCC8.C</ToolchainName>
     <ProjectGuid>{cb6f1a6c-1668-4812-9bbd-bc637a8e6292}</ProjectGuid>
-    <avrdevice>ATtiny2313A</avrdevice>
+    <avrdevice>ATtiny24A</avrdevice>
     <avrdeviceseries>none</avrdeviceseries>
     <OutputType>Executable</OutputType>
     <Language>C</Language>

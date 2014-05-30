@@ -41,10 +41,19 @@ inline void setupPorts() {
 #elif defined (__AVR_ATtiny24A__)
 
 inline void setupPorts() {
-    
+    DDRA  = 0b00100000;
+    PORTA = 0b01010000;
+    DDRB  = 0b00000001;
+    PORTB = 0b00000010;
 }
+#define SS_HIGH (PINB & (1<<PORTB1))
+#define LED_PORT PORTB
+#define LED_PORTx (1<<PORTB0)
+#define USI_INTERRUPT USI_OVF_vect
+
 /* AVR ATtiny 24A */
 #else
+#error "uController not supported"
 inline void setupPorts() {
     
 }
