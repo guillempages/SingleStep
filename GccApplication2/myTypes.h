@@ -22,8 +22,22 @@ inline void setupPorts() {
 #define SS_HIGH (PINB & (1<<PORTB4))
 #define LED_PORT PORTB
 #define LED_PORTx (1<<PORTB3)
+#define USI_INTERRUPT USI_OVF_vect
 
 /* AVR ATtiny 85 */
+#elif defined (__AVR_ATtiny2313A__)
+inline void setupPorts() {
+    DDRB  = 0b01000000;
+    PORTB = 0b10100000;
+    DDRD  = 0b00000001;
+    PORTD = 0b00000010;
+}
+#define SS_HIGH (PIND & (1<<PORTD1))
+#define LED_PORT PORTD
+#define LED_PORTx (1<<PORTD0)
+#define USI_INTERRUPT USI_OVERFLOW_vect
+
+/* AVR ATtiny 2331A */
 #elif defined (__AVR_ATtiny24A__)
 
 inline void setupPorts() {

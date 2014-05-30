@@ -26,14 +26,15 @@ void usi_init(void){
 volatile uint8_t spiCommand = 0;
 volatile uint8_t spiResult = 0;
 
-ISR (USI_OVF_vect){
+ISR (USI_INTERRUPT){
     USISR = (1<<USIOIF);              //Clear OVF flag
-    
+
+    spiCommand = USIDR;
+   
     if (spiResult != 0) {
         USIDR = spiResult;
         spiResult = 0;
     }
-    spiCommand = USIBR;
 }
 
 void executeCommand(uint8_t command) {
