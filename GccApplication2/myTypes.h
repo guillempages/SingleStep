@@ -22,11 +22,19 @@ inline void setupPorts() {
 #define SS_HIGH (PINB & (1<<PORTB4))
 #define LED_PORT PORTB
 #define LED_PORTx (1<<PORTB3)
+
+#define ADC_CONVERTERS 1
+#define ADLARREG ADMUX /* ADLAR bit in ADMUX */
+#define LIGHT_MUX 0b00100000 /* Vcc ref and ADC0 input */
+#define STEP_MUX  0b00100000 /* Vcc ref and ADC0 input */
+
 #define USI_INTERRUPT USI_OVF_vect
 
 /* AVR ATtiny 85 */
 #elif defined (__AVR_ATtiny2313A__)
 inline void setupPorts() {
+    DDRA  = 0b00000000;
+    PORTA = 0b00000100;
     DDRB  = 0b01000000;
     PORTB = 0b10100000;
     DDRD  = 0b00000001;
@@ -35,6 +43,8 @@ inline void setupPorts() {
 #define SS_HIGH (PIND & (1<<PORTD1))
 #define LED_PORT PORTD
 #define LED_PORTx (1<<PORTD0)
+#undef ADC_CONVERTERS
+
 #define USI_INTERRUPT USI_OVERFLOW_vect
 
 /* AVR ATtiny 2331A */
@@ -42,13 +52,19 @@ inline void setupPorts() {
 
 inline void setupPorts() {
     DDRA  = 0b00100000;
-    PORTA = 0b01010000;
+    DIDR0 = 0b00100000;
+    PORTA = 0b01010001;
     DDRB  = 0b00000001;
     PORTB = 0b00000010;
 }
 #define SS_HIGH (PINB & (1<<PORTB1))
 #define LED_PORT PORTB
 #define LED_PORTx (1<<PORTB0)
+#define ADC_CONVERTERS 1
+#define ADLARREG ADCSRB /* ADLAR bit in ADCSRB */
+#define LIGHT_MUX 0b00000000 /* Vcc ref and ADC0 input */
+#define STEP_MUX  0b00000010 /* Vcc ref and ADC2 input */
+
 #define USI_INTERRUPT USI_OVF_vect
 
 /* AVR ATtiny 24A */

@@ -16,6 +16,11 @@
 void setup() {
     setupPorts(); // see myTypes.h
     
+#ifdef ADC_CONVERTERS
+    PRR &= ~(1<<PRADC); //Activate ADC
+    ADLARREG |= (1<<ADLAR); //ADC Result left adjusted
+#endif 
+
     initLeds();
 }
 
@@ -25,25 +30,72 @@ void usi_init(void){
 
 volatile uint8_t spiCommand = 0;
 volatile uint8_t spiResult = 0;
+volatile bool spiResultValid = false;
 
 ISR (USI_INTERRUPT){
     USISR = (1<<USIOIF);              //Clear OVF flag
 
     spiCommand = USIDR;
    
-    if (spiResult != 0) {
+    if (spiResultValid) {
         USIDR = spiResult;
-        spiResult = 0;
+        spiResultValid = false;
     }
 }
+
+#ifdef ADC_CONVERTERS
+
+uint8_t lastSensor = 0;
+bool nextSensorValid = false;
+
+ISR(ADC_vect) {
+    if (!nextSensorValid) {
+        ADCSRA = ((1<<ADEN)|(1<<ADSC)|(0<<ADATE)|(0<<ADIF)|(1<<ADIE)|(0<<ADPS2)|(0<<ADPS1)|(0<<ADPS0));
+        nextSensorValid = true;
+    } else {
+        spiResult = ADCH;
+        if (spiResult >= 250) { //Too high values mean no sensor present.
+            spiResult = 0;
+        }
+        spiResultValid = true;
+    }
+}
+
+void startLightMeasure() {
+    ADMUX = LIGHT_MUX;
+    ADCSRA = ((1<<ADEN)|(1<<ADSC)|(0<<ADATE)|(0<<ADIF)|(1<<ADIE)|(0<<ADPS2)|(0<<ADPS1)|(0<<ADPS0));
+    
+    nextSensorValid = (lastSensor != CMD_GET_LIGHT);
+    lastSensor = CMD_GET_LIGHT;
+}
+
+void startStepMeasure() {
+    ADMUX = STEP_MUX;
+    ADCSRA = ((1<<ADEN)|(1<<ADSC)|(0<<ADATE)|(0<<ADIF)|(1<<ADIE)|(0<<ADPS2)|(0<<ADPS1)|(0<<ADPS0));
+    
+    nextSensorValid = (lastSensor != CMD_GET_STEP);
+    lastSensor = CMD_GET_STEP;
+}
+#else //ADC_CONVERTERS
+
+void startLightMeasure() {
+    spiResult = 0; // No sensor
+    spiResultValid = true;
+}
+
+void startStepMeasure() {
+    spiResult = 0; // No sensor
+    spiResultValid = true;
+}
+#endif //ADC_CONVERTERS
 
 void executeCommand(uint8_t command) {
     switch (command) {
         case CMD_GET_LIGHT:
-            spiResult = 123;
+            startLightMeasure();
             break;
         case CMD_GET_STEP:
-            spiResult = 231;
+            startStepMeasure();
             break;
         case CMD_LED_FADE_ON:
             setLedFade(true);
