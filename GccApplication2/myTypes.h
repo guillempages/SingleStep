@@ -25,8 +25,9 @@ inline void setupPorts() {
 
 #define ADC_CONVERTERS 1
 #define ADLARREG ADMUX /* ADLAR bit in ADMUX */
-#define LIGHT_MUX 0b00100000 /* Vcc ref and ADC0 input */
-#define STEP_MUX  0b00100000 /* Vcc ref and ADC0 input */
+#define MUX_VALUE (1<<ADLAR)
+#define TEMP_SELECTOR_MASK 0b00001000 /* ADC4 */
+#define TEMP_ADC           0b01101111 /* Mux value for temp in ATtiny85 */
 
 #define USI_INTERRUPT USI_OVF_vect
 
@@ -60,10 +61,12 @@ inline void setupPorts() {
 #define SS_HIGH (PINB & (1<<PORTB1))
 #define LED_PORT PORTB
 #define LED_PORTx (1<<PORTB0)
+
 #define ADC_CONVERTERS 1
 #define ADLARREG ADCSRB /* ADLAR bit in ADCSRB */
-#define LIGHT_MUX 0b00000000 /* Vcc ref and ADC0 input */
-#define STEP_MUX  0b00000010 /* Vcc ref and ADC2 input */
+#define MUX_VALUE 0
+#define TEMP_SELECTOR_MASK 0b00001000 /* If the 4th ADC selector bit is set, read internal temp sensor.*/
+#define TEMP_ADC           0b10100010 /* Mux value for temp in ATtiny24 */
 
 #define USI_INTERRUPT USI_OVF_vect
 

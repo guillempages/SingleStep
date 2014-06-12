@@ -61,53 +61,38 @@ ISR(ADC_vect) {
     }
 }
 
-void startLightMeasure() {
-    ADMUX = LIGHT_MUX;
+void startMeasure(uint8_t address) {
+    address &= CMD_PARAM_MASK;
+    
+    if (address & TEMP_SELECTOR_MASK) {
+        ADMUX = TEMP_ADC;
+    } else {
+        ADMUX = (MUX_VALUE | address);
+    }    
     ADCSRA = ((1<<ADEN)|(1<<ADSC)|(0<<ADATE)|(0<<ADIF)|(1<<ADIE)|(0<<ADPS2)|(0<<ADPS1)|(0<<ADPS0));
     
-    nextSensorValid = (lastSensor != CMD_GET_LIGHT);
-    lastSensor = CMD_GET_LIGHT;
+    nextSensorValid = (lastSensor != address);
+    lastSensor = address;
 }
 
-void startStepMeasure() {
-    ADMUX = STEP_MUX;
-    ADCSRA = ((1<<ADEN)|(1<<ADSC)|(0<<ADATE)|(0<<ADIF)|(1<<ADIE)|(0<<ADPS2)|(0<<ADPS1)|(0<<ADPS0));
-    
-    nextSensorValid = (lastSensor != CMD_GET_STEP);
-    lastSensor = CMD_GET_STEP;
-}
 #else //ADC_CONVERTERS
 
-void startLightMeasure() {
-    spiResult = 0; // No sensor
-    spiResultValid = true;
-}
-
-void startStepMeasure() {
+void startMeasure(uint8_t address) {
     spiResult = 0; // No sensor
     spiResultValid = true;
 }
 #endif //ADC_CONVERTERS
 
 void executeCommand(uint8_t command) {
-    switch (command) {
-        case CMD_GET_LIGHT:
-            startLightMeasure();
+    switch (command & CMD_COMMAND_MASK) {
+        case CMD_READ_SENSOR:
+            startMeasure(command & CMD_PARAM_MASK);
             break;
-        case CMD_GET_STEP:
-            startStepMeasure();
+        case CMD_LED_FADE:
+            setLedFade(command & CMD_PARAM_MASK);
             break;
-        case CMD_LED_FADE_ON:
-            setLedFade(true);
-            break;
-        case CMD_LED_FADE_OFF:
-            setLedFade(false);
-            break;
-        case CMD_LED_SET_ON:
-            setLedState(true);
-            break;
-        case CMD_LED_SET_OFF:
-            setLedState(false);
+        case CMD_LED_SET:
+            setLedState(command & CMD_PARAM_MASK);
             break;
         case CMD_INIT_1:
         case CMD_INIT_2:
