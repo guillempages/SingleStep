@@ -109,8 +109,8 @@ void executeCommand(uint8_t command) {
         case CMD_LED_SET_OFF:
             setLedState(false);
             break;
-        case CMD_CONFIG1:
-        case CMD_CONFIG2:
+        case CMD_INIT_1:
+        case CMD_INIT_2:
         case CMD_NOOP:
         default:
             //Nothing to do.
