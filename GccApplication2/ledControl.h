@@ -7,10 +7,8 @@ void initLeds();
 
 void runPWM();
 
-void switchLed(bool value);
+void setLedFade(uint8_t value);
 
-void setLedFade(bool value);
-
-void setLedState(bool value);
+void setLedState(uint8_t value);
 
 #endif //LED_CONTROL_H
