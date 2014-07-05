@@ -32,6 +32,11 @@ volatile uint8_t spiCommand = 0;
 volatile uint8_t spiResult = 0;
 volatile bool spiResultValid = false;
 
+volatile uint8_t eepromAddress = 0;
+volatile bool writeEeprom = false;
+
+
+
 ISR (USI_INTERRUPT){
     USISR = (1<<USIOIF);              //Clear OVF flag
 
@@ -83,6 +88,35 @@ void startMeasure(uint8_t address) {
 }
 #endif //ADC_CONVERTERS
 
+void EEPROM_write(unsigned int ucAddress, unsigned char ucData) {
+    /*
+    Wait for completion of previous write
+    */
+    while(EECR & (1<<EEPE));
+
+    /* Set Programming mode */
+    EECR = (0<<EEPM1)|(0<<EEPM0);
+    /* Set up address and data registers */
+    EEAR = ucAddress;
+    EEDR = ucData;
+    /* Write logical one to EEMPE */
+    EECR |= (1<<EEMPE);
+    /* Start eeprom write by setting EEPE */
+    EECR |= (1<<EEPE);
+}
+
+unsigned char EEPROM_read(unsigned int ucAddress) {
+    /* Wait for completion of previous write */
+    while (EECR & (1<<EEPE));
+    
+    /* Set up address register */
+    EEAR = ucAddress;
+    /* Start eeprom read by writing EERE */
+    EECR |= (1<<EERE);
+    /* Return data from data register */
+    return EEDR;
+}    
+
 void executeCommand(uint8_t command) {
     switch (command & CMD_COMMAND_MASK) {
         case CMD_READ_SENSOR:
@@ -93,6 +127,14 @@ void executeCommand(uint8_t command) {
             break;
         case CMD_LED_SET:
             setLedState(command & CMD_PARAM_MASK);
+            break;
+        case CMD_GET_THRESHOLD:
+            spiResult = EEPROM_read(command & CMD_PARAM_MASK);
+            spiResultValid = true;
+            break;
+        case CMD_SET_THRESHOLD:
+            eepromAddress = command & CMD_PARAM_MASK;
+            writeEeprom = true; //
             break;
         case CMD_INIT_1:
         case CMD_INIT_2:
@@ -114,7 +156,12 @@ int main(void)
     while(1)
     {
         if (SS_HIGH) {
-            executeCommand(spiCommand);
+            if (writeEeprom) {
+                EEPROM_write(eepromAddress, spiCommand);
+                writeEeprom = false;
+            } else {
+                executeCommand(spiCommand);
+            }            
         }
         runPWM();
     }
