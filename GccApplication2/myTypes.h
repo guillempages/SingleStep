@@ -29,6 +29,12 @@ inline void setupPorts() {
 #define TEMP_SELECTOR_MASK 0b00001000 /* ADC4 */
 #define TEMP_ADC           0b01101111 /* Mux value for temp in ATtiny85 */
 
+#define RGB_LED_PORT PORTB  // Not enough pins for RGB; 
+#define LED_W   LED_PORTx   // Treat all colours as white.
+#define LED_R   LED_PORTx
+#define LED_G   LED_PORTx
+#define LED_B   LED_PORTx
+
 #define USI_INTERRUPT USI_OVF_vect
 
 /* AVR ATtiny 85 */
@@ -38,13 +44,20 @@ inline void setupPorts() {
     PORTA = 0b00000100;
     DDRB  = 0b01000000;
     PORTB = 0b10100000;
-    DDRD  = 0b00000001;
+    DDRD  = 0b00011101;
     PORTD = 0b00000010;
 }
 #define SS_HIGH (PIND & (1<<PORTD1))
 #define LED_PORT PORTD
 #define LED_PORTx (1<<PORTD0)
 #undef ADC_CONVERTERS
+
+#define RGB_LED_PORT PORTD
+#define LED_W   (1<<PORTD0)
+#define LED_R (1 <<PORTD2)
+#define LED_G (1 <<PORTD3)
+#define LED_B (1 <<PORTD4)
+
 
 #define USI_INTERRUPT USI_OVERFLOW_vect
 
