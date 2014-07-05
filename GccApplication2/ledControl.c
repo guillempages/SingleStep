@@ -79,27 +79,27 @@ void runPWMInternal(LedId led)
 }
 
 void runPWM() {
-    for (int i = 0; i<MAX; i++) {
-        runPWMInternal(i);
+    for (int led = 0; led<MAX; led++) {
+        runPWMInternal(led);
     }
 }
 
 void setLedFade(uint8_t value)
 {
-    for (int i = Blue; i<=White; i++) {
-        ledStatus[i] = value & (1<<i);
+    for (int led = 0; led<=MAX; led++) {
+        ledStatus[led] = value & (1<<led);
     }
 }
 
 void setLedState(uint8_t value)
 {
-    for (int led = Blue; led <= White; led++) {
+    for (int led = 0; led <= MAX; led++) {
 	    if (value & (1<<led)) {
             if (!ledStatus[led]) {
                 currentTrigger[led] = LED_OFF_FREQ;
             }
         } else {
-            if (ledStatus) {
+            if (ledStatus[led]) {
                 currentTrigger[led] = LED_ON_FREQ;
             }
         }
