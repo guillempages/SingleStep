@@ -65,9 +65,9 @@ inline void setupPorts() {
 #elif defined (__AVR_ATtiny24A__)
 
 inline void setupPorts() {
-    DDRA  = 0b10101010;
-    DIDR0 = 0b10101010;
-    PORTA = 0b01010001;
+    DDRA  = 0b00101011;
+    DIDR0 = 0b00101011;
+    PORTA = 0b11010000;
     DDRB  = 0b00000001;
     PORTB = 0b00000010;
 }
@@ -79,7 +79,7 @@ inline void setupPorts() {
 #define LED_W   (1<<PORTB0)
 #define LED_R (1 <<PORTA3)
 #define LED_G (1 <<PORTA1)
-#define LED_B (1 <<PORTA7)
+#define LED_B (1 <<PORTA0)
 
 #define ADC_CONVERTERS 1
 #define ADLARREG ADCSRB /* ADLAR bit in ADCSRB */
