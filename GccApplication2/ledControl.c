@@ -5,7 +5,7 @@
 const uint8_t LED_OFF_FREQ = 64;
 const uint8_t LED_ON_FREQ = 127;
 
-typedef enum {Blue, Green, Red, White, MAX=4} LedId;
+typedef enum {Blue, Green, Red, White, MAX} LedId;
 
 
 bool ledStatus[MAX];
@@ -86,14 +86,14 @@ void runPWM() {
 
 void setLedFade(uint8_t value)
 {
-    for (int led = 0; led<=MAX; led++) {
+    for (int led = 0; led < MAX; led++) {
         ledStatus[led] = value & (1<<led);
     }
 }
 
 void setLedState(uint8_t value)
 {
-    for (int led = 0; led <= MAX; led++) {
+    for (int led = 0; led < MAX; led++) {
 	    if (value & (1<<led)) {
             if (!ledStatus[led]) {
                 currentTrigger[led] = LED_OFF_FREQ;
