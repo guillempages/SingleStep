@@ -31,6 +31,7 @@ void usi_init(void){
 volatile uint8_t spiCommand = 0;
 volatile uint8_t spiResult = 0;
 volatile bool spiResultValid = false;
+volatile bool spiCommandValid = false;
 
 volatile uint8_t eepromAddress = 0;
 volatile bool writeEeprom = false;
@@ -41,6 +42,7 @@ ISR (USI_INTERRUPT){
     USISR = (1<<USIOIF);              //Clear OVF flag
 
     spiCommand = USIDR;
+    spiCommandValid = true;
    
     if (spiResultValid) {
         USIDR = spiResult;
@@ -155,13 +157,14 @@ int main(void)
     
     while(1)
     {
-        if (SS_HIGH) {
+        if (SS_HIGH && spiCommandValid) {
             if (writeEeprom) {
                 EEPROM_write(eepromAddress, spiCommand);
                 writeEeprom = false;
             } else {
                 executeCommand(spiCommand);
             }            
+            spiCommandValid = false;
         }
         runPWM();
     }
