@@ -2,8 +2,10 @@
 #include "myTypes.h"
 #include "ledControl.h"
 
-const uint8_t LED_OFF_FREQ = 64;
-const uint8_t LED_ON_FREQ = 127;
+const uint8_t LED_OFF_FREQ = 0;
+const uint8_t LED_ON_FREQ = 32;
+const uint8_t FADE_COUNTER_FREQ = 2;
+bool fade = false;
 
 typedef enum {Blue, Green, Red, White, MAX} LedId;
 
@@ -11,12 +13,15 @@ typedef enum {Blue, Green, Red, White, MAX} LedId;
 bool ledStatus[MAX];
 int8_t currentTrigger[MAX];
 int8_t currentCount[MAX];
+int8_t fadeCounter[MAX];
 
-void initLeds() {
+void initLeds()
+{
     for (int i = 0; i<MAX; i++) {
         ledStatus[i] = false;
-        currentTrigger[i] = LED_ON_FREQ;
+        currentTrigger[i] = LED_OFF_FREQ;
         currentCount[i] = LED_OFF_FREQ;
+		fadeCounter[i] = 0;
     }    
 }    
 
@@ -56,29 +61,29 @@ void switchLed(LedId led, bool value)
 
 void runPWMInternal(LedId led)
 {
-    if (ledStatus[led]) {
-        if (currentCount[led] < LED_ON_FREQ) {
-            currentCount[led]++;
-        } else {
-            currentCount[led] = LED_OFF_FREQ;
-            if (currentTrigger[led] > LED_OFF_FREQ) {
+    if (currentCount[led] >= LED_ON_FREQ) {
+        currentCount[led] = LED_OFF_FREQ;
+    } else {
+        currentCount[led]++;
+    }
+    if (fade && currentCount[led] == LED_OFF_FREQ) {
+        fadeCounter[led]++;
+        fadeCounter[led] %= FADE_COUNTER_FREQ;
+        if (ledStatus[led] && currentTrigger[led] < LED_ON_FREQ) {
+            if (fadeCounter[led] == 0) {
+                currentTrigger[led]++;
+            }
+        } else if (!ledStatus[led] && currentTrigger[led] > LED_OFF_FREQ) {
+            if (fadeCounter[led] == 0) {
                 currentTrigger[led]--;
             }
         }
-    } else {
-        if (currentCount[led] > LED_OFF_FREQ) {
-            currentCount[led]--;
-        } else {
-            currentCount[led] = LED_ON_FREQ;
-            if (currentTrigger[led] < LED_ON_FREQ) {
-                currentTrigger[led]++;
-            }
-        }
     }
-    switchLed(led, currentCount[led] > currentTrigger[led]);
+    switchLed(led, currentCount[led] < currentTrigger[led]);
 }
 
-void runPWM() {
+void runPWM()
+{
     for (int led = 0; led<MAX; led++) {
         runPWMInternal(led);
     }
@@ -86,6 +91,7 @@ void runPWM() {
 
 void setLedFade(uint8_t value)
 {
+    fade = true;
     for (int led = 0; led < MAX; led++) {
         ledStatus[led] = value & (1<<led);
     }
@@ -93,16 +99,18 @@ void setLedFade(uint8_t value)
 
 void setLedState(uint8_t value)
 {
+    fade = false;
     for (int led = 0; led < MAX; led++) {
-	    if (value & (1<<led)) {
-            if (!ledStatus[led]) {
-                currentTrigger[led] = LED_OFF_FREQ;
-            }
+        if (value & (1<<led)) {
+            currentTrigger[led] = LED_ON_FREQ;
         } else {
-            if (ledStatus[led]) {
-                currentTrigger[led] = LED_ON_FREQ;
-            }
+            currentTrigger[led] = LED_OFF_FREQ;
         }
-        ledStatus[led] = value;
     }
+}
+
+void setLedValue(uint8_t led, uint8_t value)
+{
+    fade = false;
+    currentTrigger[led] = value;
 }

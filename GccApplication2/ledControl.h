@@ -11,4 +11,6 @@ void setLedFade(uint8_t value);
 
 void setLedState(uint8_t value);
 
+void setLedValue(uint8_t led, uint8_t value);
+
 #endif //LED_CONTROL_H
