@@ -13,6 +13,8 @@
 #include "commands.h"
 #include "ledControl.h"
 
+bool testMode = true;
+
 void setup() {
     setupPorts(); // see myTypes.h
     
@@ -120,6 +122,8 @@ unsigned char EEPROM_read(unsigned int ucAddress) {
 }    
 
 void executeCommand(uint8_t command) {
+    testMode = false;
+
     switch (command & CMD_COMMAND_MASK) {
         case CMD_READ_SENSOR:
             startMeasure(command & CMD_PARAM_MASK);
@@ -148,13 +152,25 @@ void executeCommand(uint8_t command) {
     spiCommand = CMD_NOOP; //Command was executed.
 }
 
+void runTestMode() {
+    static uint16_t i = 0;
+    static uint8_t value = 0;
+
+    if (i == 0) {
+        setLedFade(value);
+        value++;
+        value %= 16;
+    }
+    i++;
+    i%= 2048;
+}
+
 int main(void)
 {
     setup();
     usi_init();
 
     sei(); //Enable interrupts
-    
     while(1)
     {
         if (SS_HIGH && spiCommandValid) {
@@ -165,6 +181,10 @@ int main(void)
                 executeCommand(spiCommand);
             }            
             spiCommandValid = false;
+        }
+
+        if (testMode) {
+            runTestMode();
         }
         runPWM();
     }

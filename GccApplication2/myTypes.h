@@ -76,7 +76,7 @@ inline void setupPorts() {
 #define LED_PORTx (1<<PORTB0)
 
 #define RGB_LED_PORT PORTA
-#define LED_W   (1<<PORTB0)
+#define LED_W (1<<PORTB0)
 #define LED_R (1 <<PORTA3)
 #define LED_G (1 <<PORTA1)
 #define LED_B (1 <<PORTA0)
