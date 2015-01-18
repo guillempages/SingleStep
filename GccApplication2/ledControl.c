@@ -3,8 +3,8 @@
 #include "ledControl.h"
 
 const uint8_t LED_OFF_FREQ = 0;
-const uint8_t LED_ON_FREQ = 32;
-const uint8_t FADE_COUNTER_FREQ = 2;
+const uint8_t LED_ON_FREQ = 16;
+const uint8_t FADE_COUNTER_FREQ = 3;
 bool fade = false;
 
 typedef enum {Blue, Green, Red, White, MAX} LedId;

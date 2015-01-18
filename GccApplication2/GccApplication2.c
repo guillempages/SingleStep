@@ -157,9 +157,9 @@ void runTestMode() {
     static uint8_t value = 0;
 
     if (i == 0) {
-        // Make the white LED blink as fast as the Green value, so that boards with only
+        // Make the white LED blink as fast as the Blue value, so that boards with only
         // White LED can be tested more easily
-        uint8_t flippedValue = ((value & 2)<<2) | (value & 7);
+        uint8_t flippedValue = ((value & 1)<<3) | (value & 7);
         setLedFade(flippedValue);
         value++;
         value %= 16;
