@@ -13,7 +13,12 @@
 #include "commands.h"
 #include "ledControl.h"
 
-bool testMode = true;
+#define SENSOR_VALUES_AVG (5)
+uint8_t sensorValues[8][SENSOR_VALUES_AVG];
+uint8_t sensorIndex[8];
+
+const uint8_t sensorList[] = {SENSOR_IR, SENSOR_LIGHT, SENSOR_TEMP};
+const uint8_t ACTIVE_SENSORS = 3;
 
 void setup() {
     setupPorts(); // see myTypes.h
@@ -24,6 +29,12 @@ void setup() {
 #endif 
 
     initLeds();
+    for (uint8_t i = 0; i < 8; i++) {
+        sensorIndex[i] = 0;
+        for (uint8_t j = 0; j< SENSOR_VALUES_AVG; j++) {
+            sensorValues[i][j] = 0;
+        }
+    }
 }
 
 void usi_init(void){
@@ -38,7 +49,7 @@ volatile bool spiCommandValid = false;
 volatile uint8_t eepromAddress = 0;
 volatile bool writeEeprom = false;
 
-
+bool testMode = true;
 
 ISR (USI_INTERRUPT){
     USISR = (1<<USIOIF);              //Clear OVF flag
@@ -58,15 +69,18 @@ uint8_t lastSensor = 0;
 bool nextSensorValid = false;
 
 ISR(ADC_vect) {
+    uint8_t result;
     if (!nextSensorValid) {
         ADCSRA = ((1<<ADEN)|(1<<ADSC)|(0<<ADATE)|(0<<ADIF)|(1<<ADIE)|(0<<ADPS2)|(0<<ADPS1)|(0<<ADPS0));
         nextSensorValid = true;
     } else {
-        spiResult = ADCH;
-        if (spiResult >= 250) { //Too high values mean no sensor present.
-            spiResult = 0;
+        result = ADCH;
+        if (result >= 250) { //Too high values mean no sensor present.
+            result = 0;
         }
         spiResultValid = true;
+        sensorValues[lastSensor][sensorIndex[lastSensor]++] = result;
+        sensorIndex[lastSensor] %= SENSOR_VALUES_AVG;
     }
 }
 
@@ -121,12 +135,24 @@ unsigned char EEPROM_read(unsigned int ucAddress) {
     return EEDR;
 }    
 
+uint8_t calculateSensor(uint8_t sensor) {
+    int sensorValue = 0;
+    for (uint8_t i = 0; i<SENSOR_VALUES_AVG; i++) {
+        sensorValue += sensorValues[sensor][i];
+    }
+    sensorValue /= SENSOR_VALUES_AVG;
+
+    return sensorValue;
+}
+
 void executeCommand(uint8_t command) {
     testMode = false;
+    spiResult = command;
 
     switch (command & CMD_COMMAND_MASK) {
         case CMD_READ_SENSOR:
-            startMeasure(command & CMD_PARAM_MASK);
+            spiResult = calculateSensor(command & CMD_PARAM_MASK);
+            spiResultValid = true;
             break;
         case CMD_LED_FADE:
             setLedFade(command & CMD_PARAM_MASK);
@@ -150,6 +176,15 @@ void executeCommand(uint8_t command) {
             break;
     }
     spiCommand = CMD_NOOP; //Command was executed.
+}
+
+void requestSensors() {
+    static uint8_t currentSensor = 0;
+    startMeasure(sensorList[currentSensor]);
+    if (sensorIndex[currentSensor] >= SENSOR_VALUES_AVG) {
+        currentSensor++;
+        currentSensor%=ACTIVE_SENSORS;
+    }
 }
 
 void runTestMode() {
@@ -189,6 +224,7 @@ int main(void)
         if (testMode) {
             runTestMode();
         }
+        requestSensors();
         runPWM();
     }
     return 0;               /* never reached */
