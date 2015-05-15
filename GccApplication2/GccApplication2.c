@@ -177,6 +177,7 @@ int main(void)
     while(1)
     {
         if (SS_HIGH && spiCommandValid) {
+            USISR = (1<<USIOIF);      // Reset SPI counter, to synchronize clocks.
             if (writeEeprom) {
                 EEPROM_write(eepromAddress, spiCommand);
                 writeEeprom = false;
