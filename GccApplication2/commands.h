@@ -14,6 +14,8 @@
 #define CMD_GET_THRESHOLD 0x50   //Get the current threshold for the given sensor. Last 4 bits reserved for indexing.
 #define CMD_SET_THRESHOLD 0x40   //Set the current threshold for the given sensor. Last 4 bits reserved for indexing. 
                                       //The next "executable command" will be interpreted as the threshold and not executed.
+#define CMD_TEST_MODE     0xD0   //Restart the test mode.
+
 /* MASKS */
 #define CMD_COMMAND_MASK  0xF0   // Mask used to separate the command from the parameter.
 #define CMD_PARAM_MASK    0x0F   // Mask used to separate parameter from the command.

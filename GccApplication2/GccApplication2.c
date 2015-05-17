@@ -142,6 +142,9 @@ void executeCommand(uint8_t command) {
             eepromAddress = command & CMD_PARAM_MASK;
             writeEeprom = true; //
             break;
+        case CMD_TEST_MODE:
+            testMode = true;
+            break;
         case CMD_INIT_1:
         case CMD_INIT_2:
         case CMD_NOOP:
