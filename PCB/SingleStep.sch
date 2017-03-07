@@ -28,7 +28,6 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:SingleStep-cache
 EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
@@ -392,4 +391,25 @@ Wire Wire Line
 	6400 2650 6700 2650
 Wire Wire Line
 	6700 2650 6700 3250
+$Comp
+L CONN_01X02 P5
+U 1 1 58BEA466
+P 4350 5650
+F 0 "P5" H 4428 5691 50  0000 L CNN
+F 1 "Last" H 4428 5600 50  0000 L CNN
+F 2 "Connectors_JST:JST_EH_B02B-EH-A_02x2.50mm_Straight" H 4350 5650 50  0001 C CNN
+F 3 "" H 4350 5650 50  0000 C CNN
+	1    4350 5650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3950 5350 3950 5600
+Wire Wire Line
+	3950 5600 4150 5600
+Connection ~ 3950 5350
+Wire Wire Line
+	3850 5450 3850 5700
+Wire Wire Line
+	3850 5700 4150 5700
+Connection ~ 3850 5450
 $EndSCHEMATC
