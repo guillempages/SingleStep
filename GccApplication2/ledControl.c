@@ -56,6 +56,9 @@ void switchLed(LedId led, bool value)
                 RGB_LED_PORT &= ~LED_B;    /* switch LED off */
            }
            break;
+		default:
+			// Nothing to do.
+		   break;
     }
 }
 

@@ -27,7 +27,7 @@
 #define CMD_LED_FADE_OFF  CMD_LED_FADE       //Fade the LEDs slowly off.
 #define CMD_LED_FADE_ON   (CMD_LED_FADE | 0x0F) //Fade all LEDs slowly on.
 
-typedef enum {SENSOR_IR = 2, SENSOR_LIGHT = 7, SENSOR_TEMP = 8};
+typedef enum {SENSOR_IR = 2, SENSOR_LIGHT = 7, SENSOR_TEMP = 8} sensor_ids;
 
 #define CMD_GET_STEP        (CMD_READ_SENSOR | SENSOR_IR) // Get the value of the (step) sensor ADC converter (ADC 2)
 #define CMD_GET_LIGHT       (CMD_READ_SENSOR | SENSOR_LIGHT) //Get the value of the (light) sensor ADC converter (ADC 7)
