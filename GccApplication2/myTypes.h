@@ -49,14 +49,14 @@ inline void setupPorts() {
 }
 #define SS_HIGH (PIND & (1<<PORTD1))
 #define LED_PORT PORTD
-#define LED_PORTx (1<<PORTD0)
+#define LED_PORTx (1 << PORTD0)
 #undef ADC_CONVERTERS
 
 #define RGB_LED_PORT PORTD
-#define LED_W   (1<<PORTD0)
-#define LED_R (1 <<PORTD2)
-#define LED_G (1 <<PORTD3)
-#define LED_B (1 <<PORTD4)
+#define LED_W (1 << PORTD0)
+#define LED_R (1 << PORTD2)
+#define LED_G (1 << PORTD3)
+#define LED_B (1 << PORTD4)
 
 
 #define USI_INTERRUPT USI_OVERFLOW_vect
@@ -73,13 +73,13 @@ inline void setupPorts() {
 }
 #define SS_HIGH (PINB & (1<<PORTB1))
 #define LED_PORT PORTB
-#define LED_PORTx (1<<PORTB0)
+#define LED_PORTx (1 << PORTB0)
 
 #define RGB_LED_PORT PORTA
-#define LED_W (1<<PORTB0)
-#define LED_R (1 <<PORTA3)
-#define LED_G (1 <<PORTA1)
-#define LED_B (1 <<PORTA0)
+#define LED_W (1 << PORTB0)
+#define LED_R (1 << PORTA3)
+#define LED_G (1 << PORTA1)
+#define LED_B (1 << PORTA0)
 
 #define ADC_CONVERTERS 1
 #define ADLARREG ADCSRB /* ADLAR bit in ADCSRB */
